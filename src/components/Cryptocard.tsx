@@ -1,0 +1,49 @@
+// src/components/Cryptocard.tsx
+import { Link } from 'react-router-dom';
+import type { CryptoItem, Moneda } from '../Types';
+import { useFavoritosStore } from '../favoritosStore';
+
+
+interface CryptoCardProps {
+  crypto: CryptoItem;
+  monedaActiva: Moneda;
+}
+
+
+
+export function CryptoCard({ crypto, monedaActiva }: CryptoCardProps) {
+  const precioMostrar = monedaActiva === 'USD' ? crypto.priceUsd : crypto.priceEur;
+  const simboloMoneda = monedaActiva === 'USD' ? '$' : '€';
+
+  const esFavorito = useFavoritosStore(
+  (state) => state.favoritos.includes(crypto.id)
+);
+
+const alternarFavorito = useFavoritosStore(
+  (state) => state.alternarFavorito
+);
+
+  return (
+    <div className="tarjeta" style={{ border: '1px solid #ccc', padding: '15px', margin: '10px', borderRadius: '8px', minWidth: '200px', background: '#1a1a1a', color: '#fff' }}>
+      <h3>{crypto.name} ({crypto.symbol.toUpperCase()})</h3>
+      <p>Precio ({monedaActiva}): {simboloMoneda}{precioMostrar.toLocaleString()}</p>
+      
+      {/* Enlace dinámico exigido por la consigna */}
+      <Link 
+        to={`/criptomonedas/${crypto.id}`}
+        style={{ display: 'inline-block', marginTop: '10px', padding: '6px 12px', background: '#61dafb', color: '#000', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+      >
+        Ver detalle
+      </Link>
+
+      <button
+  type="button"
+  onClick={() => alternarFavorito(crypto.id)}
+  aria-pressed={esFavorito}
+  style={{ display: 'block', marginTop: '10px' }}
+>
+  {esFavorito ? '★ Quitar de favoritos' : '☆ Agregar a favoritos'}
+</button>
+    </div>
+  );
+}
